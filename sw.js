@@ -1,4 +1,4 @@
-const CACHE_NAME = 'media-workbench-v1';
+const CACHE_NAME = 'media-workbench-v2';
 const ASSETS = [
   './',
   './index.html',
