@@ -113,7 +113,30 @@ const Utils = {
     return div.innerHTML;
   },
   getPlatform(key) { return PLATFORMS[key] || { name: key, icon: '📱', color: '#666' }; },
-  getCategory(id) { return DB.getCategories().find(c => c.id === id); }
+  getCategory(id) { return DB.getCategories().find(c => c.id === id); },
+
+  /* 获取观看链接：有直链用直链，没有则生成平台搜索链接 */
+  getWatchUrl(item) {
+    if (item.videoUrl) return item.videoUrl;
+    if (item.streamUrl) return item.streamUrl;
+    const title = encodeURIComponent(item.title || '');
+    const searchUrls = {
+      douyin:    `https://www.douyin.com/search/${title}`,
+      kuaishou:  `https://www.kuaishou.com/search/video?searchKey=${title}`,
+      xhs:       `https://www.xiaohongshu.com/search_result?keyword=${title}`,
+      bilibili:  `https://search.bilibili.com/all?keyword=${title}`,
+      wechat:    `https://channels.weixin.qq.com/web/pages/search?query=${title}`,
+      youtube:   `https://www.youtube.com/results?search_query=${title}`,
+      tiktok:    `https://www.tiktok.com/search?q=${title}`,
+      toutiao:   `https://so.toutiao.com/search?keyword=${title}`,
+    };
+    return searchUrls[item.platform] || `https://www.baidu.com/s?wd=${title}`;
+  },
+
+  /* 判断是否有可观看链接 */
+  hasWatchUrl(item) {
+    return !!(item.videoUrl || item.streamUrl || item.title);
+  }
 };
 
 /* ====== Toast ====== */
@@ -370,6 +393,7 @@ const App = {
     const cat = Utils.getCategory(v.categoryId);
     const platform = Utils.getPlatform(v.platform);
     const realBadge = v.isReal ? '<span class="real-badge">📊 真实数据</span>' : '';
+    const watchUrl = Utils.getWatchUrl(v);
     return `
       <div class="video-card" onclick="App.openVideoDetail('${v.id}')">
         <div class="video-card-header">
@@ -388,6 +412,9 @@ const App = {
           <span>⏱ ${Utils.formatDuration(v.duration)}</span>
         </div>
         ${v.tags && v.tags.length ? `<div class="video-card-footer">${v.tags.map(t => `<span class="tag">${Utils.escapeHTML(t)}</span>`).join('')}</div>` : ''}
+        <div class="card-watch-btn" onclick="event.stopPropagation();window.open('${watchUrl}','_blank');">
+          ▶️ 观看视频
+        </div>
       </div>
     `;
   },
@@ -414,7 +441,9 @@ const App = {
         <div class="detail-stat"><div class="num">${Utils.formatNum(v.comments)}</div><div class="label">评论</div></div>
         <div class="detail-stat"><div class="num">${Utils.formatNum(v.shares)}</div><div class="label">分享</div></div>
       </div>
-      ${v.videoUrl ? `<a href="${v.videoUrl}" target="_blank" style="display:block;text-align:center;padding:10px;background:var(--bg-elevated);border-radius:8px;margin-bottom:12px;color:var(--primary-light);text-decoration:none;">🔗 查看原视频</a>` : ''}
+      <a href="${Utils.getWatchUrl(v)}" target="_blank" class="watch-btn-big">
+        ▶️ 点击观看视频 · ${platform.name}
+      </a>
       ${v.source ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;padding:6px 10px;background:var(--bg-elevated);border-radius:6px;">📡 数据来源：${Utils.escapeHTML(v.source)}</div>` : ''}
       ${v.script ? `
         <div class="section-title" style="margin-top:16px;">视频文案</div>
@@ -473,6 +502,7 @@ const App = {
     const cat = Utils.getCategory(s.categoryId);
     const platform = Utils.getPlatform(s.platform);
     const highlights = (s.highlights || []).map(h => `<li>${Utils.escapeHTML(h)}</li>`).join('');
+    const watchUrl = Utils.getWatchUrl(s);
     return `
       <div class="stream-card" onclick="App.openStreamDetail('${s.id}')">
         <div class="stream-card-header">
@@ -490,6 +520,9 @@ const App = {
         </div>
         ${highlights ? `<ul class="stream-highlights">${highlights}</ul>` : ''}
         ${s.tags ? `<div class="video-card-footer">${s.tags.map(t => `<span class="tag">${Utils.escapeHTML(t)}</span>`).join('')}</div>` : ''}
+        <div class="card-watch-btn" onclick="event.stopPropagation();window.open('${watchUrl}','_blank');">
+          📺 观看直播回放
+        </div>
       </div>
     `;
   },
@@ -519,6 +552,9 @@ const App = {
         <div class="num" style="font-size:14px;">${Utils.formatDurationMin(s.duration)}</div>
         <div class="label">直播时长</div>
       </div>
+      <a href="${Utils.getWatchUrl(s)}" target="_blank" class="watch-btn-big">
+        📺 观看直播回放 · ${platform.name}
+      </a>
       ${highlights ? `
         <div class="section-title">直播亮点</div>
         <ul class="stream-highlights" style="padding:0 0 12px 16px;">${highlights}</ul>
