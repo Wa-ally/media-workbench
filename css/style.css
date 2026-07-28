@@ -481,3 +481,29 @@ body { min-height: 100vh; padding-bottom: calc(var(--nav-height) + env(safe-area
 
 /* Smooth scroll */
 html { scroll-behavior: smooth; }
+
+/* ====== Watch Buttons ====== */
+.card-watch-btn {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 16px; margin: 0 16px 12px;
+  background: linear-gradient(135deg, rgba(124,108,255,0.15), rgba(0,212,170,0.15));
+  border: 1px solid rgba(124,108,255,0.3);
+  border-radius: var(--radius-sm);
+  color: var(--primary-light); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.card-watch-btn:active {
+  transform: scale(0.96);
+  background: rgba(124,108,255,0.25);
+}
+
+.watch-btn-big {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 14px; margin-bottom: 16px;
+  background: var(--gradient);
+  border-radius: var(--radius);
+  color: white; font-size: 16px; font-weight: 700;
+  text-decoration: none; cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(124,108,255,0.3);
+}
+.watch-btn-big:active { transform: scale(0.97); }
