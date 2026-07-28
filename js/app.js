@@ -294,6 +294,17 @@ const App = {
           </div>
         </div>
 
+        <div class="data-source-banner">
+          <div class="banner-title">📡 爆款数据汇总中心</div>
+          <div>当前已收录 <strong>${videos.length}</strong> 条爆款视频，其中 <strong>${DATA_SOURCE_INFO.realVideos}</strong> 条为真实全网数据</div>
+          <div class="banner-list">
+            数据来源：${DATA_SOURCE_INFO.sources.join(' · ')}
+          </div>
+          <div class="banner-limit">
+            ⚠️ 说明：抖音/快手/小红书等平台无公开搜索API，无法自动实时爬取。当前数据为公开报道整理，可通过「我的」页面手动添加新爆款。
+          </div>
+        </div>
+
         <div class="section-title">分类导航</div>
         <div class="filter-chips">
           ${categories.map(cat => `
@@ -358,6 +369,7 @@ const App = {
   renderVideoCard(v) {
     const cat = Utils.getCategory(v.categoryId);
     const platform = Utils.getPlatform(v.platform);
+    const realBadge = v.isReal ? '<span class="real-badge">📊 真实数据</span>' : '';
     return `
       <div class="video-card" onclick="App.openVideoDetail('${v.id}')">
         <div class="video-card-header">
@@ -365,6 +377,7 @@ const App = {
           <div class="video-card-meta">
             <span class="platform-badge ${v.platform}">${platform.icon} ${platform.name}</span>
             ${cat ? `<span class="category-badge"><span style="color:${cat.color}">${cat.icon}</span> ${cat.name}</span>` : ''}
+            ${realBadge}
             <span style="font-size:12px;color:var(--text-muted)">@${Utils.escapeHTML(v.author || '未知')}</span>
           </div>
         </div>
@@ -402,6 +415,7 @@ const App = {
         <div class="detail-stat"><div class="num">${Utils.formatNum(v.shares)}</div><div class="label">分享</div></div>
       </div>
       ${v.videoUrl ? `<a href="${v.videoUrl}" target="_blank" style="display:block;text-align:center;padding:10px;background:var(--bg-elevated);border-radius:8px;margin-bottom:12px;color:var(--primary-light);text-decoration:none;">🔗 查看原视频</a>` : ''}
+      ${v.source ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;padding:6px 10px;background:var(--bg-elevated);border-radius:6px;">📡 数据来源：${Utils.escapeHTML(v.source)}</div>` : ''}
       ${v.script ? `
         <div class="section-title" style="margin-top:16px;">视频文案</div>
         <div class="detail-script">${Utils.escapeHTML(v.script)}</div>
